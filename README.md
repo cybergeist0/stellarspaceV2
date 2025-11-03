@@ -67,6 +67,7 @@ src/
 - Include additional planets with accurate orbital mechanics.
 - Implement user interactivity with planetary data panels.
 - Extend the trivia timeline with more interactive visuals.
+- Increase precision of O2 data collection.
 
 ---
 
