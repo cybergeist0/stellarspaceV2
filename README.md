@@ -58,7 +58,7 @@ The project aims to provide:
 ## **Project Structure**
 stellarspaceV2/
 
-├─ backend/                # Backend scripts and servers
+├─ backend/                **Backend scripts and servers**
 
 │  ├─ pico/
 
@@ -74,7 +74,7 @@ stellarspaceV2/
 
 │  └─ server.py
 
-├─ public/                 # Static assets
+├─ public/                 **Static assets**
 
 │  └─ vite.svg
 
