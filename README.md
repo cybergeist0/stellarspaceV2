@@ -184,6 +184,11 @@ stellarspaceV2/
 - Increase precision of O2 data collection.
 
 ---
+## **Contributors**
+- Satej Gandre - Backend & Hardware
+- Ajay Balusu - Backend & Hardware
+- Dhriti Koppela - Health & Database
+- Rohit Shivarajkumar - Frontend & Docs
 
 ## **License**
 This project is open-source under the **MIT License**.
