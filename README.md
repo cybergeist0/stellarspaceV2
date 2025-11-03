@@ -44,19 +44,19 @@ src/
 ## **How to Run Locally**
 1. Clone the repository:
 
-git clone https://github.com/yourusername/stellarspace.git
+  git clone https://github.com/yourusername/stellarspace.git
 
 2. Navigate into the project:
 
-cd stellarspace
+  cd stellarspace
 
 3. Install dependencies:
 
-npm install
+  npm install
 
 4. Start the development server:
 
-npm run dev
+  npm run dev
 
 5. Open `http://localhost:5173` in your browser.
 
