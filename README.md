@@ -1,7 +1,15 @@
 # StellarSpace
 
-**StellarSpace** is an interactive web-based simulation and learning platform that allows users to explore a miniature model of the solar system, engage with trivia about cosmic history, and simulate environments in space. The project is built using **React**, **TypeScript**, **Three.js**, and **TailwindCSS**, with a focus on immersive visual experiences and educational content.
+**StellarSpace V2** is an interactive space simulation and life-support monitoring system, designed to model and visualize a miniature solar system while also providing a foundation for real-world environmental monitoring and control. The system includes a web-based simulation interface, sensor and control modules using a Pi Pico microcontroller, a Raspberry Pi client, and a workstation server for coordination.
 
+The project aims to provide:
+
+- A realistic Solar System simulation with **Mars accurately modeled** in color, orbit, and rotation.
+- A foundation for life-support monitoring using sensors for environmental factors like oxygen, temperature, and power usage.
+- Integration of Pi Pico and Raspberry Pi modules for sensor data collection and server communication.
+- A responsive web interface for visualization and control, using React, Three.js, and Tailwind CSS.
+
+---
 ---
 
 ## **Features**
@@ -11,6 +19,7 @@
 - **Mars-focused simulation**: Only Mars is rendered with realistic color, size, rotation, and orbit.
 - Interactive controls: Orbit, zoom, and pan using mouse or trackpad.
 - Dynamic **starfield background** and glowing Sun.
+- 
 
 ### **Home Page**
 - Futuristic translucent content area with glow effects.
