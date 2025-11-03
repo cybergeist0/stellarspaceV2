@@ -34,12 +34,44 @@
 ---
 
 ## **Project Structure**
-src/
-├─ components/ # Reusable components like BackgroundLayout
-├─ pages/ # HomePage, SimulationPage, TriviaPage
-├─ App.tsx # Main routing and layout
-├─ main.tsx # App bootstrap
-├─ App.css # Global styles & animations
+stellarspaceV2/
+├─ backend/ # Backend scripts and servers
+│ ├─ pico/
+│ │ └─ code.py
+│ └─ rpi/
+│ ├─ client.py
+│ └─ script.sh
+├─ workstation/
+│ └─ server.py
+├─ public/ # Static assets
+│ └─ vite.svg
+├─ src/
+│ ├─ api/
+│ │ └─ backend.ts
+│ ├─ assets/
+│ │ └─ react.svg
+│ ├─ components/
+│ │ ├─ AlertModal.tsx
+│ │ ├─ BackgroundLayout.tsx
+│ │ └─ SensorCard.tsx
+│ ├─ pages/
+│ │ ├─ ControlPanel.tsx
+│ │ ├─ HomePage.tsx
+│ │ ├─ SimulationPage.tsx
+│ │ └─ TriviaPage.tsx
+│ ├─ App.css
+│ ├─ App.tsx
+│ └─ main.tsx
+├─ .gitignore
+├─ README.md
+├─ eslint.config.js
+├─ index.html
+├─ package-lock.json
+├─ package.json
+├─ tsconfig.app.json
+├─ tsconfig.json
+├─ tsconfig.node.json
+└─ vite.config.ts
 
 ## **How to Run Locally**
 1. Clone the repository:
