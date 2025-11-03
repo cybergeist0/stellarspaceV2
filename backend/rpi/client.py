@@ -5,7 +5,7 @@ import adafruit_si7021
 import serial
 import time
 
-HOST = '192.168.1.174'
+HOST = '192.168.137.215'
 PORT = 8000
 
 ser = serial.Serial("/dev/ttyS0", 9600, timeout=1)
