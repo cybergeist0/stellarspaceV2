@@ -31,6 +31,7 @@ Key deliverables of StellarSpaceV2 include:
 In summary, the project deliverables include a functional prototype of the centralized dashboard, fully interactive 3D simulation of Mars, and modular backend infrastructure to manage sensor data and alerts. Additionally, the project includes reusable frontend components such as `SensorCard` and `AlertModal`, API endpoints for real-time data streaming, and visual enhancements such as animated backgrounds and translucent content boxes to maintain readability while reflecting a futuristic, space-oriented design. StellarSpaceV2 provides a proof-of-concept platform for life-support management in extraterrestrial habitats, illustrating both software-hardware integration and interactive visualization of critical living conditions.
 
 Overall, StellarSpaceV2 demonstrates a holistic approach to building a digital ecosystem for space habitats, combining real-time monitoring, anomaly detection, user-specific alerts, and 3D interactive simulations. The project is modular and extensible, allowing future integration with additional sensors, expanded user functionality, or more complex planetary simulations, while remaining aligned with the core goal of creating the central brain for a Martian or Lunar living environment.
+
 ---
 ## **Features**
 
