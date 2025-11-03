@@ -72,7 +72,6 @@ const App: React.FC = () => {
                     <div className="flex items-center space-x-8 text-sm font-medium">
                         <a href="/simulation" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Simulation</a>
                         <a href="/health" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Health</a>
-                        <a href="#" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Machine Learning</a>
                         <a href="/trivia" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Trivia</a>
                         <a href="/control" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Control</a>
                     </div>

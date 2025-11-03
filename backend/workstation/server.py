@@ -1,7 +1,7 @@
 import socket
 import threading
 from flask import Flask, jsonify
-from flask_cors import CORS  # ✅ NEW IMPORT
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"])  # ✅ ALLOW frontend access

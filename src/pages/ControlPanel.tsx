@@ -1,3 +1,4 @@
+// ...existing code...
 import React, { useEffect, useState, useRef } from 'react';
 import SensorCard from '../components/SensorCard';
 import AlertModal from '../components/AlertModal';
@@ -27,12 +28,9 @@ const ControlPanel: React.FC = () => {
     const [alerts, setAlerts] = useState<AlertItem[]>([]);
     const [profiles] = useState<Profile[]>(defaultProfiles);
     const [activeProfileId, setActiveProfileId] = useState<string>(profiles[0].id);
-    const [ledOn, setLedOn] = useState(false);
-    const [fanOn, setFanOn] = useState(false);
+
     const pollingRef = useRef<number | null>(null);
-
     const alertTimersRef = useRef<Record<string, { fade?: number; remove?: number }>>({});
-
     const prevOxygenRef = useRef<number | null>(null);
     const prevWaterRef = useRef<boolean | null>(null);
 
@@ -63,14 +61,12 @@ const ControlPanel: React.FC = () => {
     };
 
     const closeAlert = (id: string) => {
-        // clear any scheduled timers
         const timers = alertTimersRef.current[id];
         if (timers) {
             if (timers.fade) clearTimeout(timers.fade);
             if (timers.remove) clearTimeout(timers.remove);
             delete alertTimersRef.current[id];
         }
-        // remove from state immediately
         setAlerts((a) => a.filter((x) => x.id !== id));
     };
 
@@ -90,23 +86,18 @@ const ControlPanel: React.FC = () => {
         };
 
         const checkAlerts = (data: Record<string, any>) => {
-            // Oxygen: generate a single alert when oxygen first drops below the profile's warn threshold.
-            // Do not spam repeated alerts while oxygen remains below the warning threshold.
             const oxygen = typeof data.oxygen === 'number' ? data.oxygen : NaN;
             const prevO = prevOxygenRef.current;
             const warn = activeProfile?.oxygenWarn;
             const danger = activeProfile?.oxygenDanger;
 
             if (!isNaN(oxygen) && warn !== undefined) {
-                // If previously above warn (or unknown) and now <= warn -> alert once.
                 if ((prevO === null || prevO > warn) && oxygen <= warn) {
                     const level = danger !== undefined && oxygen <= danger ? 'danger' : 'warn';
                     addAlert({ id: `oxy-${Date.now()}`, message: `Oxygen low: ${oxygen}%`, level });
                 }
             }
 
-            // Water: reverse logic — alert when THERE ISN'T water (water_detected === false).
-            // Only alert once when it changes from true (or unknown) to false.
             const waterPresent = data.water_detected === true;
             const prevWater = prevWaterRef.current;
             if (waterPresent === false) {
@@ -115,16 +106,13 @@ const ControlPanel: React.FC = () => {
                 }
             }
 
-            // Update previous values for edge detection
             prevOxygenRef.current = isNaN(oxygen) ? prevOxygenRef.current : oxygen;
             prevWaterRef.current = waterPresent === true ? true : waterPresent === false ? false : prevWaterRef.current;
         };
 
         const normalizePercent = (raw: any): number | null => {
             if (raw === null || raw === undefined) return null;
-            // If already a number, use it.
             if (typeof raw === 'number') return raw;
-            // If string, strip non-numeric characters (handles trailing nulls/nonprintables) and parse.
             if (typeof raw === 'string') {
                 const cleaned = raw.replace(/[^\d.\-eE+]/g, '').trim();
                 if (!cleaned) return null;
@@ -139,7 +127,6 @@ const ControlPanel: React.FC = () => {
                 const raw = await api.getEnvironment();
                 if (!mounted) return;
 
-                // Normalize the incoming payload, specifically light and water_conductivity (6-byte strings -> float %)
                 const normalized: Record<string, any> = { ...raw };
                 normalized.light = normalizePercent(raw.light);
                 normalized.water_conductivity = normalizePercent(raw.water_conductivity);
@@ -148,12 +135,10 @@ const ControlPanel: React.FC = () => {
                 pushHistory(normalized);
                 checkAlerts(normalized);
             } catch (err) {
-                // keep backend-error persistent (don't auto-dismiss) and avoid duplicates
                 setAlerts((prev) => {
                     if (prev.some((a) => a.id === 'backend-error')) return prev;
-                    // use addAlert with autoDismiss=false for this one
                     addAlert({ id: 'backend-error', message: `Cannot reach backend: ${(err as Error).message}`, level: 'warn' }, false);
-                    return prev; // addAlert already appended
+                    return prev;
                 });
             }
         };
@@ -164,42 +149,47 @@ const ControlPanel: React.FC = () => {
         return () => {
             mounted = false;
             if (pollingRef.current) clearInterval(pollingRef.current);
-
-            // clear any pending alert timers
             Object.values(alertTimersRef.current).forEach((t) => {
                 if (t.fade) clearTimeout(t.fade);
                 if (t.remove) clearTimeout(t.remove);
             });
             alertTimersRef.current = {};
         };
-    }, [activeProfileId]); // re-run when profile changes
+    }, [activeProfileId]);
 
-    const handleToggleLed = async () => {
-        const target = !ledOn;
-        setLedOn(target); // optimistic update
-        const res = await api.setLed({ on: target });
-        if (res.simulated) {
-            addAlert({ id: `led-sim-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'} (simulated)`, level: 'info' });
-        } else if (!res.success) {
-            setLedOn((s) => !s); // revert
-            addAlert({ id: `led-err-${Date.now()}`, message: `LED command failed: ${res.message ?? 'unknown'}`, level: 'warn' });
-        } else {
-            addAlert({ id: `led-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'}`, level: 'info' });
+    // send numeric RGB values to device
+    const sendRgbState = async (r: number, g: number, b: number) => {
+        const url = `http://192.168.137.246/?r=${r}&g=${g}&b=${b}`;
+        try {
+            const resp = await fetch(url, { method: 'GET' });
+            if (!resp.ok) {
+                const text = await resp.text().catch(() => resp.statusText);
+                throw new Error(`Device responded ${resp.status}: ${text}`);
+            }
+            addAlert({ id: `rgb-${Date.now()}`, message: `RGB set: r=${r} g=${g} b=${b}`, level: 'info' });
+            return { success: true };
+        } catch (err) {
+            addAlert({ id: `rgb-err-${Date.now()}`, message: `Failed to set RGB: ${(err as Error).message}`, level: 'warn' });
+            return { success: false, message: (err as Error).message };
         }
     };
 
-    const handleToggleFan = async () => {
-        const target = !fanOn;
-        setFanOn(target);
-        const res = await api.setFan({ on: target });
-        if (res.simulated) {
-            addAlert({ id: `fan-sim-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'} (simulated)`, level: 'info' });
-        } else if (!res.success) {
-            setFanOn((s) => !s);
-            addAlert({ id: `fan-err-${Date.now()}`, message: `Fan command failed: ${res.message ?? 'unknown'}`, level: 'warn' });
-        } else {
-            addAlert({ id: `fan-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'}`, level: 'info' });
-        }
+    // Form submit handler - no persistent LED state is stored; form is reset after submit
+    const handleRgbFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        const rOn = fd.get('red') === 'on';
+        const gOn = fd.get('green') === 'on';
+        const bOn = fd.get('blue') === 'on';
+
+        const r = rOn ? 255 : 0;
+        const g = gOn ? 255 : 0;
+        const b = bOn ? 255 : 0;
+
+        await sendRgbState(r, g, b);
+
+        // clear the form (no persistent LED state)
+        (e.currentTarget as HTMLFormElement).reset();
     };
 
     const sensorOrder = ['temperature', 'humidity', 'oxygen', 'light', 'water_conductivity', 'water_detected', 'camera'];
@@ -239,47 +229,60 @@ const ControlPanel: React.FC = () => {
                 <div className="p-4 rounded-lg bg-gray-900 border border-gray-700 shadow-sm w-full">
                     <div className="text-sm text-gray-400 mb-2">Actuators</div>
 
-                    <div className="flex items-center justify-between py-2">
-                        <div>
-                            <div className="text-sm">LED</div>
-                            <div className="text-xs text-gray-400">Control indicator LED on Pi (simulated if backend missing)</div>
+                    <form onSubmit={handleRgbFormSubmit} className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-sm">Red</div>
+                                <div className="text-xs text-gray-400">Toggle red channel</div>
+                            </div>
+                            <label className="flex items-center space-x-2">
+                                <input name="red" type="checkbox" className="form-checkbox h-5 w-5 text-red-500" />
+                                <span className="text-xs text-gray-300">Enable</span>
+                            </label>
                         </div>
-                        <div>
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-sm">Green</div>
+                                <div className="text-xs text-gray-400">Toggle green channel</div>
+                            </div>
+                            <label className="flex items-center space-x-2">
+                                <input name="green" type="checkbox" className="form-checkbox h-5 w-5 text-green-500" />
+                                <span className="text-xs text-gray-300">Enable</span>
+                            </label>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-sm">Blue</div>
+                                <div className="text-xs text-gray-400">Toggle blue channel</div>
+                            </div>
+                            <label className="flex items-center space-x-2">
+                                <input name="blue" type="checkbox" className="form-checkbox h-5 w-5 text-blue-500" />
+                                <span className="text-xs text-gray-300">Enable</span>
+                            </label>
+                        </div>
+
+                        <div className="flex items-center justify-end space-x-2 pt-2">
+                            <button type="submit" className="px-3 py-1 rounded bg-indigo-600 text-white hover:opacity-90">
+                                Set
+                            </button>
                             <button
-                                onClick={handleToggleLed}
-                                className={`px-3 py-1 rounded ${ledOn ? 'bg-green-500' : 'bg-gray-700'} hover:opacity-90`}
+                                type="button"
+                                className="px-3 py-1 rounded bg-gray-700 text-gray-200 hover:opacity-90"
+                                onClick={(ev) => {
+                                    (ev.currentTarget.closest('form') as HTMLFormElement)?.reset();
+                                }}
                             >
-                                {ledOn ? 'ON' : 'OFF'}
+                                Clear
                             </button>
                         </div>
-                    </div>
 
-                    <div className="flex items-center justify-between py-2">
-                        <div>
-                            <div className="text-sm">Fan</div>
-                            <div className="text-xs text-gray-400">Ventilation fan (simulated if backend missing)</div>
+                        <div className="mt-2 text-xs text-gray-400">
+                            Sends GET to <code className="bg-gray-800 px-1 rounded">http://192.168.137.246/?r=&lt;r&gt;&amp;g=&lt;g&gt;&amp;b=&lt;b&gt;</code> with values 0/255.
                         </div>
-                        <div>
-                            <button
-                                onClick={handleToggleFan}
-                                className={`px-3 py-1 rounded ${fanOn ? 'bg-green-500' : 'bg-gray-700'} hover:opacity-90`}
-                            >
-                                {fanOn ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 text-xs text-gray-400">
-                        Example controls — extend by adding real endpoints in <code className="bg-gray-800 px-1 rounded">backend_server.py</code>.
-                    </div>
+                    </form>
                 </div>
-            </section>
-
-            <section>
-                <h3 className="text-lg font-semibold mb-2">Raw telemetry</h3>
-                <pre className="bg-gray-900 border border-gray-800 p-3 rounded text-xs overflow-auto max-h-48">
-                    {JSON.stringify(env, null, 2)}
-                </pre>
             </section>
 
             <AlertModal alerts={alerts} onClose={closeAlert} />
