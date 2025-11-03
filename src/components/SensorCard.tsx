@@ -8,6 +8,9 @@ type Props = {
     warningThreshold?: number;
     dangerThreshold?: number;
     onAction?: React.ReactNode | null;
+    isWebcam?: boolean;
+    iframeSrc?: string;
+    iframeTitle?: string;
 };
 
 const Sparkline: React.FC<{ data?: number[] }> = ({ data = [] }) => {
@@ -32,7 +35,7 @@ const Sparkline: React.FC<{ data?: number[] }> = ({ data = [] }) => {
     );
 };
 
-const SensorCard: React.FC<Props> = ({ label, value, unit, history, warningThreshold, dangerThreshold, onAction = null }) => {
+const SensorCard: React.FC<Props> = ({ label, value, unit, history, warningThreshold, dangerThreshold, onAction = null, isWebcam = false, iframeSrc, iframeTitle = 'webcam' }) => {
     const numeric = typeof value === 'number' ? value : NaN;
     let borderClass = 'border-gray-700';
     if (!isNaN(numeric) && dangerThreshold !== undefined && numeric <= dangerThreshold) {
@@ -41,14 +44,18 @@ const SensorCard: React.FC<Props> = ({ label, value, unit, history, warningThres
         borderClass = 'border-yellow-500';
     }
 
+    const showWebcam = isWebcam || !!iframeSrc;
+
     const display =
-        value === null || value === undefined
-            ? '—'
-            : typeof value === 'boolean'
-                ? value
-                    ? 'Yes'
-                    : 'No'
-                : value;
+        showWebcam
+            ? ''
+            : value === null || value === undefined
+                ? '—'
+                : typeof value === 'boolean'
+                    ? value
+                        ? 'Yes'
+                        : 'No'
+                    : value;
 
     return (
         <div className={`p-4 rounded-lg bg-gray-900 border ${borderClass} shadow-sm w-full max-w-xs`}>
@@ -64,7 +71,26 @@ const SensorCard: React.FC<Props> = ({ label, value, unit, history, warningThres
             </div>
 
             <div className="mt-3">
-                <Sparkline data={history} />
+                {showWebcam ? (
+                    <div className="w-full rounded bg-black overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                        {iframeSrc ? (
+                            <iframe
+                                src={iframeSrc}
+                                className="w-full h-full border-0"
+                                scrolling="no"
+                                width="320"
+                                height="176"
+                                sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm p-4">
+                                No iframe source provided
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <Sparkline data={history} />
+                )}
             </div>
         </div>
     );

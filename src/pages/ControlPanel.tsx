@@ -12,7 +12,7 @@ const defaultProfiles: Profile[] = [
 ];
 
 const AUTO_DISMISS_MS = 2000;
-const FADE_MS = 500; // must match AlertModal transition duration
+const FADE_MS = 500;
 
 const ControlPanel: React.FC = () => {
     const [env, setEnv] = useState<Record<string, any>>({
@@ -20,8 +20,8 @@ const ControlPanel: React.FC = () => {
         temperature: null,
         oxygen: null,
         water_detected: null,
-        light: null, // added light in initial state
-        water_conductivity: null, // added water_conductivity in initial state
+        light: null,
+        water_conductivity: null,
     });
     const [history, setHistory] = useState<Record<string, number[]>>({});
     const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -31,35 +31,29 @@ const ControlPanel: React.FC = () => {
     const [fanOn, setFanOn] = useState(false);
     const pollingRef = useRef<number | null>(null);
 
-    // timers for auto-removal and fade of alerts
     const alertTimersRef = useRef<Record<string, { fade?: number; remove?: number }>>({});
 
-    // track previous sensor values to avoid repeated alerts for the same condition
     const prevOxygenRef = useRef<number | null>(null);
     const prevWaterRef = useRef<boolean | null>(null);
 
     const activeProfile = profiles.find((p) => p.id === activeProfileId)!;
 
-    // addAlert managed by ControlPanel: can auto-dismiss (default true)
     const addAlert = (alert: AlertItem, autoDismiss = true) => {
         const withVisible: AlertItem = { ...alert, visible: true };
         setAlerts((prev) => [...prev, withVisible]);
 
         if (autoDismiss) {
-            // clear any existing timers for this id
             const existing = alertTimersRef.current[alert.id];
             if (existing) {
                 if (existing.fade) clearTimeout(existing.fade);
                 if (existing.remove) clearTimeout(existing.remove);
             }
 
-            // schedule fade slightly before removal
             const fadeDelay = Math.max(0, AUTO_DISMISS_MS - FADE_MS);
             const fadeTimer = window.setTimeout(() => {
                 setAlerts((prev) => prev.map((a) => (a.id === alert.id ? { ...a, visible: false } : a)));
             }, fadeDelay);
 
-            // schedule remove after full duration
             const removeTimer = window.setTimeout(() => {
                 closeAlert(alert.id);
             }, AUTO_DISMISS_MS);
@@ -208,7 +202,7 @@ const ControlPanel: React.FC = () => {
         }
     };
 
-    const sensorOrder = ['temperature', 'humidity', 'oxygen', 'light', 'water_conductivity', 'water_detected']; // added water_conductivity here
+    const sensorOrder = ['temperature', 'humidity', 'oxygen', 'light', 'water_conductivity', 'water_detected', 'camera'];
 
     return (
         <div className="p-6">
@@ -236,6 +230,9 @@ const ControlPanel: React.FC = () => {
                         warningThreshold={key === 'oxygen' ? activeProfile?.oxygenWarn : undefined}
                         dangerThreshold={key === 'oxygen' ? activeProfile?.oxygenDanger : undefined}
                         onAction={null}
+                        isWebcam={key === 'camera'}
+                        iframeSrc={key === 'camera' ? 'http://192.168.137.250:9081' : undefined}
+                        iframeTitle=""
                     />
                 ))}
 
