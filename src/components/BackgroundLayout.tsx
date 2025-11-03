@@ -222,7 +222,8 @@ const BackgroundLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="absolute inset-0 z-0">
+    // make decorative background non-interactive so UI elements above are clickable
+    <div className="absolute inset-0 z-0 pointer-events-none">
       {/* Layer 1: Static, smaller stars */}
       <div className="absolute inset-0" style={{
         backgroundImage: 'radial-gradient(white .5px, transparent 0)',
@@ -230,14 +231,14 @@ const BackgroundLayout: React.FC = () => {
         opacity: 0.15
       }}></div>
 
-      {/* Layer 2: Interactive Canvas Stars */}
-      <canvas ref={canvasRef} className="absolute inset-0"></canvas>
+  {/* Layer 2: Interactive Canvas Stars (non-interactive for pointer events) */}
+  <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none"></canvas>
 
       {/* Layer 3: Dynamic Aurora Blobs */}
       {blobs.map((blob) => (
         <div
           key={blob.id}
-          className="absolute rounded-full filter blur-3xl"
+          className="absolute rounded-full filter blur-3xl pointer-events-none"
           style={{
             width: `${blob.size}px`,
             height: `${blob.size}px`,
@@ -252,7 +253,7 @@ const BackgroundLayout: React.FC = () => {
       {sparkles.map((sparkle) => (
         <div
           key={sparkle.id}
-          className="sparkle-container"
+          className="sparkle-container pointer-events-none"
           style={{
             top: `${sparkle.y}px`,
             left: `${sparkle.x}px`,

@@ -4,10 +4,12 @@ import HomePage from './pages/HomePage.tsx';
 import SimulationPage from './pages/SimulationPage.tsx';
 import TriviaPage from './pages/TriviaPage.tsx';
 import ControlPanel from './pages/ControlPanel.tsx';
+import Health from './pages/Health';
 
 const routes: { [key: string]: React.FC } = {
     '/': HomePage,
     '/simulation': SimulationPage,
+    '/health': Health,
     '/trivia': TriviaPage,
     '/control': ControlPanel,
 };
@@ -69,6 +71,7 @@ const App: React.FC = () => {
                 <nav className="top-0 w-full p-6 z-50 flex justify-between items-center backdrop-blur-sm bg-black/20 border-b border-gray-800/50">
                     <div className="flex items-center space-x-8 text-sm font-medium">
                         <a href="/simulation" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Simulation</a>
+                        <a href="/health" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Health</a>
                         <a href="#" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Machine Learning</a>
                         <a href="/trivia" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Trivia</a>
                         <a href="/control" className="text-gray-300 hover:text-purple-300 transition-colors duration-300">Control</a>
