@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# StellarSpace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**StellarSpace** is an interactive web-based simulation and learning platform that allows users to explore a miniature model of the solar system, engage with trivia about cosmic history, and simulate environments in space. The project is built using **React**, **TypeScript**, **Three.js**, and **TailwindCSS**, with a focus on immersive visual experiences and educational content.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## **Features**
 
-## React Compiler
+### **Simulation Page**
+- Real-time 3D solar system simulation using **Three.js**.
+- **Mars-focused simulation**: Only Mars is rendered with realistic color, size, rotation, and orbit.
+- Interactive controls: Orbit, zoom, and pan using mouse or trackpad.
+- Dynamic **starfield background** and glowing Sun.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### **Home Page**
+- Futuristic translucent content area with glow effects.
+- Welcome message and description of the simulation.
 
-## Expanding the ESLint configuration
+### **Trivia Page**
+- Timeline of the universe from the Big Bang to modern humans.
+- Hoverable event markers with information cards, images, and descriptions.
+- Fully responsive layout for desktop and mobile.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## **Technologies Used**
+- **React 19** & **TypeScript** – Component-based front-end development.
+- **Three.js & @react-three/fiber** – 3D graphics rendering.
+- **@react-three/drei** – Helpers for camera controls, stars, and geometry.
+- **TailwindCSS** – Rapid UI styling with utility classes.
+- **Vite** – Fast development server and build tool.
+- **Git & GitHub** – Version control and project deployment.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## **Project Structure**
+src/
+├─ components/ # Reusable components like BackgroundLayout
+├─ pages/ # HomePage, SimulationPage, TriviaPage
+├─ App.tsx # Main routing and layout
+├─ main.tsx # App bootstrap
+├─ App.css # Global styles & animations
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## **How to Run Locally**
+1. Clone the repository:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+git clone https://github.com/yourusername/stellarspace.git
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2. Navigate into the project:
+
+cd stellarspace
+
+3. Install dependencies:
+
+npm install
+
+4. Start the development server:
+
+npm run dev
+
+5. Open `http://localhost:5173` in your browser.
+
+---
+
+## **Future Improvements**
+- Add more realistic textures for Mars and other celestial bodies.
+- Include additional planets with accurate orbital mechanics.
+- Implement user interactivity with planetary data panels.
+- Extend the trivia timeline with more interactive visuals.
+
+---
+
+## **License**
+This project is open-source under the **MIT License**.
