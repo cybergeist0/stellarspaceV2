@@ -19,7 +19,21 @@ The project aims to provide:
 - **Mars-focused simulation**: Only Mars is rendered with realistic color, size, rotation, and orbit.
 - Interactive controls: Orbit, zoom, and pan using mouse or trackpad.
 - Dynamic **starfield background** and glowing Sun.
-- 
+
+**3D interactive Solar System** rendered in the browser with `@react-three/fiber` and `@react-three/drei`.
+
+**Mars-focused simulation**:
+  - Correct color approximation.
+  - Accurate orbit and rotation speed relative to the Sun.
+  - Only Mars is displayed (all other planets removed except the Sun).
+- **Interactive controls**:
+  - Click and drag to orbit the camera.
+  - Scroll to zoom in/out.
+  - Right-click to pan.
+- **Visual enhancements**:
+  - Glow and emissive Sun.
+  - Starfield background using `Stars` component.
+  - Planet orbit paths visualized with rings.
 
 ### **Home Page**
 - Futuristic translucent content area with glow effects.
