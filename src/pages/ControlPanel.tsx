@@ -4,11 +4,15 @@ import AlertModal from '../components/AlertModal';
 import * as api from '../api/backend';
 
 type Profile = { id: string; name: string; oxygenWarn?: number; oxygenDanger?: number };
+type AlertItem = { id: string; message: string; level?: 'info' | 'warn' | 'danger'; visible?: boolean };
 
 const defaultProfiles: Profile[] = [
     { id: 'commander', name: 'Commander', oxygenWarn: 19.5, oxygenDanger: 18.5 },
     { id: 'engineer', name: 'Engineer', oxygenWarn: 19.0, oxygenDanger: 18.0 },
 ];
+
+const AUTO_DISMISS_MS = 2000;
+const FADE_MS = 500; // must match AlertModal transition duration
 
 const ControlPanel: React.FC = () => {
     const [env, setEnv] = useState<Record<string, any>>({
@@ -16,16 +20,65 @@ const ControlPanel: React.FC = () => {
         temperature: null,
         oxygen: null,
         water_detected: null,
+        light: null, // added light in initial state
+        water_conductivity: null, // added water_conductivity in initial state
     });
     const [history, setHistory] = useState<Record<string, number[]>>({});
-    const [alerts, setAlerts] = useState<{ id: string; message: string; level?: 'info' | 'warn' | 'danger' }[]>([]);
+    const [alerts, setAlerts] = useState<AlertItem[]>([]);
     const [profiles] = useState<Profile[]>(defaultProfiles);
     const [activeProfileId, setActiveProfileId] = useState<string>(profiles[0].id);
     const [ledOn, setLedOn] = useState(false);
     const [fanOn, setFanOn] = useState(false);
     const pollingRef = useRef<number | null>(null);
 
+    // timers for auto-removal and fade of alerts
+    const alertTimersRef = useRef<Record<string, { fade?: number; remove?: number }>>({});
+
+    // track previous sensor values to avoid repeated alerts for the same condition
+    const prevOxygenRef = useRef<number | null>(null);
+    const prevWaterRef = useRef<boolean | null>(null);
+
     const activeProfile = profiles.find((p) => p.id === activeProfileId)!;
+
+    // addAlert managed by ControlPanel: can auto-dismiss (default true)
+    const addAlert = (alert: AlertItem, autoDismiss = true) => {
+        const withVisible: AlertItem = { ...alert, visible: true };
+        setAlerts((prev) => [...prev, withVisible]);
+
+        if (autoDismiss) {
+            // clear any existing timers for this id
+            const existing = alertTimersRef.current[alert.id];
+            if (existing) {
+                if (existing.fade) clearTimeout(existing.fade);
+                if (existing.remove) clearTimeout(existing.remove);
+            }
+
+            // schedule fade slightly before removal
+            const fadeDelay = Math.max(0, AUTO_DISMISS_MS - FADE_MS);
+            const fadeTimer = window.setTimeout(() => {
+                setAlerts((prev) => prev.map((a) => (a.id === alert.id ? { ...a, visible: false } : a)));
+            }, fadeDelay);
+
+            // schedule remove after full duration
+            const removeTimer = window.setTimeout(() => {
+                closeAlert(alert.id);
+            }, AUTO_DISMISS_MS);
+
+            alertTimersRef.current[alert.id] = { fade: fadeTimer, remove: removeTimer };
+        }
+    };
+
+    const closeAlert = (id: string) => {
+        // clear any scheduled timers
+        const timers = alertTimersRef.current[id];
+        if (timers) {
+            if (timers.fade) clearTimeout(timers.fade);
+            if (timers.remove) clearTimeout(timers.remove);
+            delete alertTimersRef.current[id];
+        }
+        // remove from state immediately
+        setAlerts((a) => a.filter((x) => x.id !== id));
+    };
 
     useEffect(() => {
         let mounted = true;
@@ -43,36 +96,70 @@ const ControlPanel: React.FC = () => {
         };
 
         const checkAlerts = (data: Record<string, any>) => {
-            const newAlerts: typeof alerts = [];
+            // Oxygen: generate a single alert when oxygen first drops below the profile's warn threshold.
+            // Do not spam repeated alerts while oxygen remains below the warning threshold.
             const oxygen = typeof data.oxygen === 'number' ? data.oxygen : NaN;
-            if (!isNaN(oxygen)) {
-                if (activeProfile && activeProfile.oxygenDanger !== undefined && oxygen <= activeProfile.oxygenDanger) {
-                    newAlerts.push({ id: `oxy-danger-${Date.now()}`, message: `Oxygen critically low: ${oxygen}%`, level: 'danger' });
-                } else if (activeProfile && activeProfile.oxygenWarn !== undefined && oxygen <= activeProfile.oxygenWarn) {
-                    newAlerts.push({ id: `oxy-warn-${Date.now()}`, message: `Oxygen low: ${oxygen}%`, level: 'warn' });
+            const prevO = prevOxygenRef.current;
+            const warn = activeProfile?.oxygenWarn;
+            const danger = activeProfile?.oxygenDanger;
+
+            if (!isNaN(oxygen) && warn !== undefined) {
+                // If previously above warn (or unknown) and now <= warn -> alert once.
+                if ((prevO === null || prevO > warn) && oxygen <= warn) {
+                    const level = danger !== undefined && oxygen <= danger ? 'danger' : 'warn';
+                    addAlert({ id: `oxy-${Date.now()}`, message: `Oxygen low: ${oxygen}%`, level });
                 }
             }
 
-            if (data.water_detected === true) {
-                newAlerts.push({ id: `water-${Date.now()}`, message: `Water detected in the system!`, level: 'warn' });
+            // Water: reverse logic — alert when THERE ISN'T water (water_detected === false).
+            // Only alert once when it changes from true (or unknown) to false.
+            const waterPresent = data.water_detected === true;
+            const prevWater = prevWaterRef.current;
+            if (waterPresent === false) {
+                if (prevWater === null || prevWater === true) {
+                    addAlert({ id: `water-missing-${Date.now()}`, message: `Water not detected in the system!`, level: 'warn' });
+                }
             }
 
-            if (newAlerts.length > 0) {
-                setAlerts((prev) => [...prev, ...newAlerts]);
+            // Update previous values for edge detection
+            prevOxygenRef.current = isNaN(oxygen) ? prevOxygenRef.current : oxygen;
+            prevWaterRef.current = waterPresent === true ? true : waterPresent === false ? false : prevWaterRef.current;
+        };
+
+        const normalizePercent = (raw: any): number | null => {
+            if (raw === null || raw === undefined) return null;
+            // If already a number, use it.
+            if (typeof raw === 'number') return raw;
+            // If string, strip non-numeric characters (handles trailing nulls/nonprintables) and parse.
+            if (typeof raw === 'string') {
+                const cleaned = raw.replace(/[^\d.\-eE+]/g, '').trim();
+                if (!cleaned) return null;
+                const parsed = parseFloat(cleaned);
+                return Number.isFinite(parsed) ? parsed : null;
             }
+            return null;
         };
 
         const doFetch = async () => {
             try {
-                const data = await api.getEnvironment();
+                const raw = await api.getEnvironment();
                 if (!mounted) return;
-                setEnv(data as Record<string, any>);
-                pushHistory(data as Record<string, any>);
-                checkAlerts(data as Record<string, any>);
+
+                // Normalize the incoming payload, specifically light and water_conductivity (6-byte strings -> float %)
+                const normalized: Record<string, any> = { ...raw };
+                normalized.light = normalizePercent(raw.light);
+                normalized.water_conductivity = normalizePercent(raw.water_conductivity);
+
+                setEnv(normalized);
+                pushHistory(normalized);
+                checkAlerts(normalized);
             } catch (err) {
+                // keep backend-error persistent (don't auto-dismiss) and avoid duplicates
                 setAlerts((prev) => {
                     if (prev.some((a) => a.id === 'backend-error')) return prev;
-                    return [...prev, { id: 'backend-error', message: `Cannot reach backend: ${(err as Error).message}`, level: 'warn' }];
+                    // use addAlert with autoDismiss=false for this one
+                    addAlert({ id: 'backend-error', message: `Cannot reach backend: ${(err as Error).message}`, level: 'warn' }, false);
+                    return prev; // addAlert already appended
                 });
             }
         };
@@ -83,20 +170,27 @@ const ControlPanel: React.FC = () => {
         return () => {
             mounted = false;
             if (pollingRef.current) clearInterval(pollingRef.current);
+
+            // clear any pending alert timers
+            Object.values(alertTimersRef.current).forEach((t) => {
+                if (t.fade) clearTimeout(t.fade);
+                if (t.remove) clearTimeout(t.remove);
+            });
+            alertTimersRef.current = {};
         };
-    }, [activeProfileId]);
+    }, [activeProfileId]); // re-run when profile changes
 
     const handleToggleLed = async () => {
         const target = !ledOn;
         setLedOn(target); // optimistic update
         const res = await api.setLed({ on: target });
         if (res.simulated) {
-            setAlerts((a) => [...a, { id: `led-sim-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'} (simulated)`, level: 'info' }]);
+            addAlert({ id: `led-sim-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'} (simulated)`, level: 'info' });
         } else if (!res.success) {
             setLedOn((s) => !s); // revert
-            setAlerts((a) => [...a, { id: `led-err-${Date.now()}`, message: `LED command failed: ${res.message ?? 'unknown'}`, level: 'warn' }]);
+            addAlert({ id: `led-err-${Date.now()}`, message: `LED command failed: ${res.message ?? 'unknown'}`, level: 'warn' });
         } else {
-            setAlerts((a) => [...a, { id: `led-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'}`, level: 'info' }]);
+            addAlert({ id: `led-${Date.now()}`, message: `LED ${target ? 'ON' : 'OFF'}`, level: 'info' });
         }
     };
 
@@ -105,18 +199,16 @@ const ControlPanel: React.FC = () => {
         setFanOn(target);
         const res = await api.setFan({ on: target });
         if (res.simulated) {
-            setAlerts((a) => [...a, { id: `fan-sim-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'} (simulated)`, level: 'info' }]);
+            addAlert({ id: `fan-sim-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'} (simulated)`, level: 'info' });
         } else if (!res.success) {
             setFanOn((s) => !s);
-            setAlerts((a) => [...a, { id: `fan-err-${Date.now()}`, message: `Fan command failed: ${res.message ?? 'unknown'}`, level: 'warn' }]);
+            addAlert({ id: `fan-err-${Date.now()}`, message: `Fan command failed: ${res.message ?? 'unknown'}`, level: 'warn' });
         } else {
-            setAlerts((a) => [...a, { id: `fan-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'}`, level: 'info' }]);
+            addAlert({ id: `fan-${Date.now()}`, message: `Fan ${target ? 'activated' : 'stopped'}`, level: 'info' });
         }
     };
 
-    const closeAlert = (id: string) => setAlerts((a) => a.filter((x) => x.id !== id));
-
-    const sensorOrder = ['temperature', 'humidity', 'oxygen', 'water_detected'];
+    const sensorOrder = ['temperature', 'humidity', 'oxygen', 'light', 'water_conductivity', 'water_detected']; // added water_conductivity here
 
     return (
         <div className="p-6">
@@ -137,9 +229,9 @@ const ControlPanel: React.FC = () => {
                 {sensorOrder.map((key) => (
                     <SensorCard
                         key={key}
-                        label={key === 'water_detected' ? 'Water Detected' : key.charAt(0).toUpperCase() + key.slice(1)}
+                        label={key === 'water_detected' ? 'Water Detected' : key === 'water_conductivity' ? 'Water Conductivity' : key.charAt(0).toUpperCase() + key.slice(1)}
                         value={env[key]}
-                        unit={key === 'oxygen' ? '%' : key === 'temperature' ? '°C' : key === 'humidity' ? '%' : undefined}
+                        unit={key === 'oxygen' || key === 'light' || key === 'water_conductivity' ? '%' : key === 'temperature' ? '*C' : key === 'humidity' ? '%' : undefined}
                         history={history[key]}
                         warningThreshold={key === 'oxygen' ? activeProfile?.oxygenWarn : undefined}
                         dangerThreshold={key === 'oxygen' ? activeProfile?.oxygenDanger : undefined}

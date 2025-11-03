@@ -1,9 +1,10 @@
-# backend_server.py
 import socket
 import threading
 from flask import Flask, jsonify
+from flask_cors import CORS  # ✅ NEW IMPORT
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])  # ✅ ALLOW frontend access
 
 # --- Global variable to hold latest data from Raspberry Pi ---
 latest_data = {
@@ -41,12 +42,21 @@ def socket_server():
                     temp = float(parts[1].replace('C', ''))
                     oxygen = float(parts[2].replace('%', ''))
                     water = parts[3] == 'True'
+                    light = parts[4]
+                    waterc = parts[5]
+
+                    if (float(waterc) > 15.0):
+                        water = "True"
+                    else:
+                        water = "False"
 
                     latest_data.update({
                         "humidity": humidity,
                         "temperature": temp,
                         "oxygen": oxygen,
-                        "water_detected": water
+                        "water_detected": water,
+                        "light": light,
+                        "water_conductivity": waterc
                     })
                     print(f"[SOCKET] Updated data: {latest_data}")
                 except Exception as e:
@@ -59,5 +69,4 @@ def get_environment():
 if __name__ == "__main__":
     socket_thread = threading.Thread(target=socket_server, daemon=True)
     socket_thread.start()
-
     app.run(host="0.0.0.0", port=5001)
