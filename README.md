@@ -10,7 +10,28 @@ The project aims to provide:
 - A responsive web interface for visualization and control, using React, Three.js, and Tailwind CSS.
 
 ---
+## **Summary**
+# StellarSpaceV2
 
+StellarSpaceV2 is a centralized smart dashboard prototype designed to manage life-support systems and personal living needs for a small Martian or Lunar habitat. The system simulates real-time monitoring and control of critical modules including oxygen levels, temperature, food inventory, power usage, sleep cycles, and mental wellness alerts for a small group of 4–6 users living in a closed environment. The project combines a fully interactive web-based interface with simulated sensor data, alerts, and user-specific recommendations, creating a functional representation of the "brain" of a space home.
+
+The frontend interface is built using React, TypeScript, TailwindCSS, and React Three Fiber for 3D visualization. The dashboard includes multiple pages such as a control panel, simulation, and informational timelines, all of which are fully responsive and visually consistent with a futuristic space aesthetic. The simulation page models the solar system with a focus on Mars, rendered with accurate color, rotation, and orbital characteristics. Users can interact with the 3D environment through zooming, panning, and rotation, providing an immersive educational experience alongside the life-support monitoring interface.
+
+Backend components are developed in TypeScript and Python, coordinating data from simulated sensors and real hardware devices. Pi Pico microcontrollers generate mock sensor readings for environmental factors, while a Raspberry Pi serves as the client to process and transmit this data to the backend server. Python scripts automate data collection, simulate anomalies, and handle alerts, providing real-time feedback that is visualized through the dashboard. Individual user profiles allow for custom notifications, such as hydration reminders, sleep recommendations, or mental wellness alerts, demonstrating a personalized approach to life-support management.
+
+Key deliverables of StellarSpaceV2 include:
+
+- **Interactive Solar System Simulation:** A 3D model rendered in React Three Fiber with accurate Mars modeling, orbital paths, and rotational dynamics, including user-controlled camera manipulation.  
+- **Frontend Dashboard:** Fully responsive pages including `HomePage`, `SimulationPage`, `ControlPanel`, and `TriviaPage` with styled, readable content and animated backgrounds to enhance user experience.  
+- **Hardware Integration:** Pi Pico and Raspberry Pi scripts simulating environmental data, including sensor input and output pipelines, coordinated with the backend server for live visualization.  
+- **API & Data Layer:** TypeScript-based backend (`backend.ts`) providing structured endpoints to feed the frontend with simulated or real-time data from connected devices.  
+- **User Interaction Features:** Alerts, notifications, and interactive visual elements like `SensorCard` and `AlertModal` to demonstrate practical applications of life-support monitoring.  
+- **Static Assets & Utilities:** Centralized asset management (`assets`, `public`) and reusable components for clean, maintainable code structure.  
+
+In summary, the project deliverables include a functional prototype of the centralized dashboard, fully interactive 3D simulation of Mars, and modular backend infrastructure to manage sensor data and alerts. Additionally, the project includes reusable frontend components such as `SensorCard` and `AlertModal`, API endpoints for real-time data streaming, and visual enhancements such as animated backgrounds and translucent content boxes to maintain readability while reflecting a futuristic, space-oriented design. StellarSpaceV2 provides a proof-of-concept platform for life-support management in extraterrestrial habitats, illustrating both software-hardware integration and interactive visualization of critical living conditions.
+
+Overall, StellarSpaceV2 demonstrates a holistic approach to building a digital ecosystem for space habitats, combining real-time monitoring, anomaly detection, user-specific alerts, and 3D interactive simulations. The project is modular and extensible, allowing future integration with additional sensors, expanded user functionality, or more complex planetary simulations, while remaining aligned with the core goal of creating the central brain for a Martian or Lunar living environment.
+---
 ## **Features**
 
 ### **Simulation Page**
@@ -161,27 +182,6 @@ stellarspaceV2/
 - Extend the trivia timeline with more interactive visuals.
 - Increase precision of O2 data collection.
 
-## **Summary**
-# StellarSpaceV2
-
-StellarSpaceV2 is a centralized smart dashboard prototype designed to manage life-support systems and personal living needs for a small Martian or Lunar habitat. The system simulates real-time monitoring and control of critical modules including oxygen levels, temperature, food inventory, power usage, sleep cycles, and mental wellness alerts for a small group of 4–6 users living in a closed environment. The project combines a fully interactive web-based interface with simulated sensor data, alerts, and user-specific recommendations, creating a functional representation of the "brain" of a space home.
-
-The frontend interface is built using React, TypeScript, TailwindCSS, and React Three Fiber for 3D visualization. The dashboard includes multiple pages such as a control panel, simulation, and informational timelines, all of which are fully responsive and visually consistent with a futuristic space aesthetic. The simulation page models the solar system with a focus on Mars, rendered with accurate color, rotation, and orbital characteristics. Users can interact with the 3D environment through zooming, panning, and rotation, providing an immersive educational experience alongside the life-support monitoring interface.
-
-Backend components are developed in TypeScript and Python, coordinating data from simulated sensors and real hardware devices. Pi Pico microcontrollers generate mock sensor readings for environmental factors, while a Raspberry Pi serves as the client to process and transmit this data to the backend server. Python scripts automate data collection, simulate anomalies, and handle alerts, providing real-time feedback that is visualized through the dashboard. Individual user profiles allow for custom notifications, such as hydration reminders, sleep recommendations, or mental wellness alerts, demonstrating a personalized approach to life-support management.
-
-Key deliverables of StellarSpaceV2 include:
-
-- **Interactive Solar System Simulation:** A 3D model rendered in React Three Fiber with accurate Mars modeling, orbital paths, and rotational dynamics, including user-controlled camera manipulation.  
-- **Frontend Dashboard:** Fully responsive pages including `HomePage`, `SimulationPage`, `ControlPanel`, and `TriviaPage` with styled, readable content and animated backgrounds to enhance user experience.  
-- **Hardware Integration:** Pi Pico and Raspberry Pi scripts simulating environmental data, including sensor input and output pipelines, coordinated with the backend server for live visualization.  
-- **API & Data Layer:** TypeScript-based backend (`backend.ts`) providing structured endpoints to feed the frontend with simulated or real-time data from connected devices.  
-- **User Interaction Features:** Alerts, notifications, and interactive visual elements like `SensorCard` and `AlertModal` to demonstrate practical applications of life-support monitoring.  
-- **Static Assets & Utilities:** Centralized asset management (`assets`, `public`) and reusable components for clean, maintainable code structure.  
-
-In summary, the project deliverables include a functional prototype of the centralized dashboard, fully interactive 3D simulation of Mars, and modular backend infrastructure to manage sensor data and alerts. Additionally, the project includes reusable frontend components such as `SensorCard` and `AlertModal`, API endpoints for real-time data streaming, and visual enhancements such as animated backgrounds and translucent content boxes to maintain readability while reflecting a futuristic, space-oriented design. StellarSpaceV2 provides a proof-of-concept platform for life-support management in extraterrestrial habitats, illustrating both software-hardware integration and interactive visualization of critical living conditions.
-
-Overall, StellarSpaceV2 demonstrates a holistic approach to building a digital ecosystem for space habitats, combining real-time monitoring, anomaly detection, user-specific alerts, and 3D interactive simulations. The project is modular and extensible, allowing future integration with additional sensors, expanded user functionality, or more complex planetary simulations, while remaining aligned with the core goal of creating the central brain for a Martian or Lunar living environment.
 ---
 
 ## **License**
