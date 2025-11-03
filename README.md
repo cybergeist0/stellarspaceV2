@@ -58,33 +58,33 @@ The project aims to provide:
 
 ## **Project Structure**
 stellarspaceV2/
-├─ backend/ # Backend scripts and servers
-│ ├─ pico/
-│ │ └─ code.py
-│ └─ rpi/
-│ ├─ client.py
-│ └─ script.sh
+├─ backend/                # Backend scripts and servers
+│  ├─ pico/
+│  │  └─ code.py
+│  └─ rpi/
+│     ├─ client.py
+│     └─ script.sh
 ├─ workstation/
-│ └─ server.py
-├─ public/ # Static assets
-│ └─ vite.svg
+│  └─ server.py
+├─ public/                 # Static assets
+│  └─ vite.svg
 ├─ src/
-│ ├─ api/
-│ │ └─ backend.ts
-│ ├─ assets/
-│ │ └─ react.svg
-│ ├─ components/
-│ │ ├─ AlertModal.tsx
-│ │ ├─ BackgroundLayout.tsx
-│ │ └─ SensorCard.tsx
-│ ├─ pages/
-│ │ ├─ ControlPanel.tsx
-│ │ ├─ HomePage.tsx
-│ │ ├─ SimulationPage.tsx
-│ │ └─ TriviaPage.tsx
-│ ├─ App.css
-│ ├─ App.tsx
-│ └─ main.tsx
+│  ├─ api/
+│  │  └─ backend.ts
+│  ├─ assets/
+│  │  └─ react.svg
+│  ├─ components/
+│  │  ├─ AlertModal.tsx
+│  │  ├─ BackgroundLayout.tsx
+│  │  └─ SensorCard.tsx
+│  ├─ pages/
+│  │  ├─ ControlPanel.tsx
+│  │  ├─ HomePage.tsx
+│  │  ├─ SimulationPage.tsx
+│  │  └─ TriviaPage.tsx
+│  ├─ App.css
+│  ├─ App.tsx
+│  └─ main.tsx
 ├─ .gitignore
 ├─ README.md
 ├─ eslint.config.js
@@ -95,6 +95,7 @@ stellarspaceV2/
 ├─ tsconfig.json
 ├─ tsconfig.node.json
 └─ vite.config.ts
+
 
 ## **How to Run Locally**
 1. Clone the repository:
