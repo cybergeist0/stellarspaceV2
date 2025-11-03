@@ -10,7 +10,6 @@ The project aims to provide:
 - A responsive web interface for visualization and control, using React, Three.js, and Tailwind CSS.
 
 ---
----
 
 ## **Features**
 
@@ -58,42 +57,79 @@ The project aims to provide:
 
 ## **Project Structure**
 stellarspaceV2/
+
 ├─ backend/                # Backend scripts and servers
+
 │  ├─ pico/
+
 │  │  └─ code.py
+
 │  └─ rpi/
+
 │     ├─ client.py
+
 │     └─ script.sh
+
 ├─ workstation/
+
 │  └─ server.py
+
 ├─ public/                 # Static assets
+
 │  └─ vite.svg
+
 ├─ src/
+
 │  ├─ api/
+
 │  │  └─ backend.ts
+
 │  ├─ assets/
+
 │  │  └─ react.svg
+
 │  ├─ components/
+
 │  │  ├─ AlertModal.tsx
+
 │  │  ├─ BackgroundLayout.tsx
+
 │  │  └─ SensorCard.tsx
+
 │  ├─ pages/
+
 │  │  ├─ ControlPanel.tsx
+
 │  │  ├─ HomePage.tsx
+
 │  │  ├─ SimulationPage.tsx
+
 │  │  └─ TriviaPage.tsx
+
 │  ├─ App.css
+
 │  ├─ App.tsx
+
 │  └─ main.tsx
+
 ├─ .gitignore
+
 ├─ README.md
+
 ├─ eslint.config.js
+
 ├─ index.html
+
 ├─ package-lock.json
+
 ├─ package.json
+
 ├─ tsconfig.app.json
+
 ├─ tsconfig.json
+
 ├─ tsconfig.node.json
+
 └─ vite.config.ts
 
 
