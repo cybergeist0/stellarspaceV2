@@ -158,7 +158,7 @@ stellarspaceV2/
 ## **How to Run Locally**
 1. Clone the repository:
 
-  git clone https://github.com/yourusername/stellarspace.git
+  git clone https://github.com/cybergeist0/stellarspaceV2.git
 
 2. Navigate into the project:
 
