@@ -4,9 +4,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])  # ✅ ALLOW frontend access
+CORS(app, origins=["http://localhost:5173"])  # and again
 
-# --- Global variable to hold latest data from Raspberry Pi ---
 latest_data = {
     "humidity": None,
     "temperature": None,
@@ -14,9 +13,8 @@ latest_data = {
     "water_detected": None
 }
 
-# --- Function to start a TCP socket server ---
 def socket_server():
-    HOST = '0.0.0.0'  # Listen on all interfaces
+    HOST = '0.0.0.0'
     PORT = 8000
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -35,7 +33,7 @@ def socket_server():
                 decoded = data.decode('utf-8')
                 print(f"[SOCKET] Received data: {decoded}")
 
-                # Example data format: "100% 37.1C 85.4% False"
+                # could be messed due to emi but who knows
                 parts = decoded.split()
                 try:
                     humidity = float(parts[0].replace('%', ''))
