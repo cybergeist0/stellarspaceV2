@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useEffect, useState, useRef } from 'react';
 import SensorCard from '../components/SensorCard';
 import AlertModal from '../components/AlertModal';
@@ -174,7 +173,6 @@ const ControlPanel: React.FC = () => {
         }
     };
 
-    // Form submit handler - no persistent LED state is stored; form is reset after submit
     const handleRgbFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
