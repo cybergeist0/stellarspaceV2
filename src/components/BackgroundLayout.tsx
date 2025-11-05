@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// Helper function to generate a random number within a range
 const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
-// Pre-defined color gradients for the blobs
+// they're just blurred circles shhhhh
 const auroaColors = [
   'radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.4), rgba(138, 43, 226, 0))',
   'radial-gradient(circle at 50% 50%, rgba(75, 0, 130, 0.4), rgba(75, 0, 130, 0))',
@@ -82,7 +81,6 @@ const BackgroundLayout: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
 
-  // Effect for blobs and sparkles
   useEffect(() => {
     const initialBlobs = Array.from({ length: 4 }, (_, i) => createBlob(i));
     setBlobs(initialBlobs);
@@ -126,7 +124,6 @@ const BackgroundLayout: React.FC = () => {
     };
   }, []);
 
-  // Effect for interactive starfield canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -231,7 +228,7 @@ const BackgroundLayout: React.FC = () => {
         opacity: 0.15
       }}></div>
 
-  {/* Layer 2: Interactive Canvas Stars (non-interactive for pointer events) */}
+  {/* Layer 2: Interactive Canvas Stars */}
   <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none"></canvas>
 
       {/* Layer 3: Dynamic Aurora Blobs */}
