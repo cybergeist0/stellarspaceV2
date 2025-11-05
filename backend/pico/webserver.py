@@ -3,8 +3,8 @@ import socket
 import time
 import machine
 
-ssid = 'DBACS'
-password = 'BABABA1235'
+ssid = ''
+password = ''
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
@@ -46,7 +46,6 @@ print('Now configuring pinout')
 
 ledpin = machine.Pin(0, Pin.OUT)
 
-# Listen for connections
 while True:
     try:
         cl, addr = s.accept()
