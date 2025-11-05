@@ -10,7 +10,6 @@ type Props = {
 const levelColor = (level?: Alert['level']) =>
     level === 'danger' ? 'bg-red-600' : level === 'warn' ? 'bg-yellow-500' : 'bg-blue-600';
 
-// keep in sync with ControlPanel FADE_MS
 const FADE_MS = 500;
 
 const AlertModal: React.FC<Props> = ({ alerts, onClose }) => {
