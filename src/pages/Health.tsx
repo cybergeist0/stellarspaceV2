@@ -80,7 +80,7 @@ const Health: React.FC = () => {
                 preferred_sleep_hours: preferredSleep,
                 daily_water_goal_ml: dailyWaterGoal,
             });
-            // After registering, auto-login
+            // auto-login
             const resp = await axios.post('http://localhost:5555/api/login', { username, password });
             localStorage.setItem('token', resp.data.token);
             setIsLoggedIn(true);
