@@ -8,19 +8,18 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 app = Flask(__name__)
-# Configure CORS to allow requests from frontend
+# damn CORS
 CORS(app, 
      resources={r"/api/*": {"origins": "*"}},
      supports_credentials=True,
      allow_headers=["Content-Type", "Authorization"],
      methods=["GET", "POST", "OPTIONS"])
 
-# MySQL configurations - provided by user
 db_config = {
     'host': 'sql5.freesqldatabase.com',
-    'user': 'sql5805903',
-    'password': 'X7B7ncRxHF',
-    'database': 'sql5805903',
+    'user': '',
+    'password': '',
+    'database': '',
     'port': 3306,
 }
 
